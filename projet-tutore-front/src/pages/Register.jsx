@@ -37,7 +37,7 @@ const RegisterForm = () => {
     }
   };
 
-  // Structure du champ avec icône à gauche
+  // Structure du champ avec icône à gauche de la page
   const renderInput = (icon, placeholder, type = 'text') => (
     <div className="flex items-center border-b border-white py-2 text-white">
       <span className="mr-2 text-lg">{icon}</span>
