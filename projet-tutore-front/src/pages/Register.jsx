@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FaUser, FaEnvelope, FaLock, FaGraduationCap, FaIdCard, FaBuilding, FaUserTie } from 'react-icons/fa';
 
 const RegisterForm = () => {
-  const [role, setRole] = useState('');
+  const [_role, setRole] = useState('');
   const [extraFields, setExtraFields] = useState([]);
 
   // Met à jour les champs supplémentaires selon le rôle sélectionné
@@ -118,3 +118,180 @@ const RegisterForm = () => {
 };
 
 export default RegisterForm;
+
+
+// import React, { useState } from "react";
+// import {
+//   FaUser,
+//   FaEnvelope,
+//   FaLock,
+//   FaGraduationCap,
+//   FaBuilding,
+//   FaArrowLeft,
+//   FaKey
+// } from "react-icons/fa";
+
+// export default function RegisterPage() {
+//   const [role, setRole] = useState("");
+
+//   const renderExtraFields = () => {
+//     switch (role) {
+//       case "etudiant":
+//         return (
+//           <>
+//             <div className="input-group">
+//               <FaKey className="icon" />
+//               <input type="text" placeholder="Matricule" required />
+//             </div>
+//             <div className="input-group">
+//               <FaGraduationCap className="icon" />
+//               <input type="text" placeholder="Filière" required />
+//             </div>
+//             <div className="input-group">
+//               <FaGraduationCap className="icon" />
+//               <input type="text" placeholder="Niveau d'étude" required />
+//             </div>
+//           </>
+//         );
+//       case "enseignant":
+//         return (
+//           <>
+//             <div className="input-group">
+//               <FaKey className="icon" />
+//               <input type="text" placeholder="Matricule enseignant" required />
+//             </div>
+//             <div className="input-group">
+//               <FaGraduationCap className="icon" />
+//               <input type="text" placeholder="Spécialité" required />
+//             </div>
+//             <div className="input-group">
+//               <FaBuilding className="icon" />
+//               <input type="text" placeholder="Département" required />
+//             </div>
+//           </>
+//         );
+//       case "scolarite":
+//       case "admin":
+//         return (
+//           <>
+//             <div className="input-group">
+//               <FaKey className="icon" />
+//               <input type="text" placeholder="Identifiant interne" required />
+//             </div>
+//             <div className="input-group">
+//               <FaBuilding className="icon" />
+//               <input type="text" placeholder="Fonction ou service" required />
+//             </div>
+//           </>
+//         );
+//       default:
+//         return null;
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-screen flex flex-col md:flex-row bg-blue-50">
+//       {/* Section Formulaire */}
+//       <div className="flex-1 flex items-center justify-center p-6">
+//         <div className="w-full max-w-lg bg-white shadow-xl rounded-xl p-8">
+//           <h2 className="text-2xl font-bold text-blue-700 text-center mb-6">
+//             Créer un compte
+//           </h2>
+
+//           <form className="space-y-4">
+//             <div className="flex space-x-4">
+//               <div className="input-group">
+//                 <FaUser className="icon" />
+//                 <input type="text" placeholder="Nom" required />
+//               </div>
+//               <div className="input-group">
+//                 <FaUser className="icon" />
+//                 <input type="text" placeholder="Prénom" required />
+//               </div>
+//             </div>
+
+//             <div className="input-group">
+//               <FaEnvelope className="icon" />
+//               <input type="email" placeholder="Adresse email" required />
+//             </div>
+//             <div className="input-group">
+//               <FaLock className="icon" />
+//               <input type="password" placeholder="Mot de passe" required />
+//             </div>
+//             <div className="input-group">
+//               <FaLock className="icon" />
+//               <input type="password" placeholder="Confirmer le mot de passe" required />
+//             </div>
+
+//             <div className="input-group">
+//               <FaUser className="icon" />
+//               <select
+//                 value={role}
+//                 onChange={(e) => setRole(e.target.value)}
+//                 required
+//               >
+//                 <option value="">-- Sélectionnez un rôle --</option>
+//                 <option value="etudiant">Étudiant</option>
+//                 <option value="enseignant">Enseignant</option>
+//                 <option value="scolarite">Scolarité</option>
+//                 <option value="admin">Administration</option>
+//               </select>
+//             </div>
+
+//             {renderExtraFields()}
+
+//             <button
+//               type="submit"
+//               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-xl font-semibold transition"
+//             >
+//               S'inscrire
+//             </button>
+
+//             <p className="text-center text-sm text-blue-600 mt-4">
+//               Vous avez déjà un compte ?
+//               <a href="/login" className="ml-1 underline hover:text-blue-800">
+//                 Connexion
+//               </a>
+//             </p>
+//           </form>
+//         </div>
+//       </div>
+
+//       {/* Section Bleue Décorative */}
+//       <div className="hidden md:flex md:w-1/2 relative bg-blue-700 trapezoid-shape text-white items-center justify-center p-10">
+//         <a href="/" className="absolute top-6 right-6 text-white hover:text-blue-200">
+//           <FaArrowLeft size={24} />
+//         </a>
+
+//         <div className="absolute top-6 left-6">
+//           {/* Logo Placeholder */}
+//           <div className="w-20 h-20 bg-white rounded-md" />
+//         </div>
+
+//         <div className="text-center max-w-sm">
+//           <h2 className="text-3xl font-bold mb-4">Bienvenue sur la plateforme</h2>
+//           <p className="text-lg opacity-90">
+//             Veuillez remplir le formulaire pour accéder à votre espace personnalisé.
+//           </p>
+//         </div>
+//       </div>
+
+//       {/* Styles personnalisés */}
+//       <style jsx>{`
+//         .trapezoid-shape {
+//           clip-path: polygon(10% 0%, 100% 0, 100% 100%, 0% 100%);
+//         }
+//         .input-group {
+//           @apply flex items-center border border-gray-300 rounded-lg px-4 py-2 w-full bg-white;
+//         }
+//         .icon {
+//           @apply text-blue-700 mr-2;
+//         }
+//         input,
+//         select {
+//           @apply w-full outline-none bg-transparent;
+//         }
+//       `}</style>
+//     </div>
+//   );
+// }

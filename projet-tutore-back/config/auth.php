@@ -40,6 +40,13 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        
+        // ➕ Guard API basé sur Sanctum pour le modèle Connexion
+        'api' => [
+            'driver' => 'sanctum',
+            'provider' => 'connexions',
+        ],
+        
     ],
 
     /*
@@ -69,6 +76,12 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+
+        // ➕ Provider personnalisé pour table "connexions"
+        'connexions' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Connexion::class,
+        ],
     ],
 
     /*
