@@ -141,43 +141,89 @@ class AuthController extends Controller
     /**
      * Connexion avec email, mot de passe et code de sécurité
      */
-    public function login(Request $request)
-    {
-        // Validation des champs
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-            'code_securite' => 'required|string',
-        ]);
 
-        // Recherche de la connexion par email
-        $connexion = Connexion::where('email', $request->email)->first();
+public function login(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|string',
+        'code_securite' => 'required|string',
+    ]);
 
-        // Vérification des identifiants
-        if (!$connexion || !Hash::check($request->password, $connexion->password)) {
-            return response()->json(['message' => 'Email ou mot de passe incorrect'], 401);
-        }
+    $connexion = Connexion::where('email', $request->email)->first();
 
-        // Vérification du code de sécurité
-        if ($connexion->code_securite !== $request->code_securite) {
-            return response()->json(['message' => 'Code de sécurité invalide'], 401);
-        }
-
-        // Mise à jour du dernier login
-        $connexion->last_login = now();
-        $connexion->save();
-
-        // Création du token d'authentification Sanctum
-        $token = $connexion->createToken('auth_token')->plainTextToken;
-
-        // Réponse
-        return response()->json([
-            'message' => 'Connexion réussie',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'utilisateur' => $connexion->utilisateur,
-        ], 200);
+    if (!$connexion || !Hash::check($request->password, $connexion->password)) {
+        return response()->json(['message' => 'Email ou mot de passe incorrect'], 401);
     }
+
+    if ($connexion->code_securite !== $request->code_securite) {
+        return response()->json(['message' => 'Code de sécurité invalide'], 401);
+    }
+
+    $connexion->last_login = now();
+    $connexion->save();
+
+    $token = $connexion->createToken('auth_token')->plainTextToken;
+
+    // Récupérer le rôle
+    $roleName = strtolower($connexion->utilisateur->role->nom);
+
+    // Définir l'URL de redirection selon le rôle
+    $redirectUrl = match($roleName) {
+        'etudiant' => '/dashboard/etudiant',
+        'enseignant' => '/dashboard/enseignant',
+        'responsable academique' => '/dashboard/responsable',
+        default => '/dashboard',
+    };
+
+    return response()->json([
+        'message' => 'Connexion réussie',
+        'access_token' => $token,
+        'token_type' => 'Bearer',
+        'utilisateur' => $connexion->utilisateur,
+        'redirect_url' => $redirectUrl,
+        'role' => $roleName,
+    ], 200);
+}
+
+
+    // public function login(Request $request)
+    // {
+    //     // Validation des champs
+    //     $request->validate([
+    //         'email' => 'required|email',
+    //         'password' => 'required|string',
+    //         'code_securite' => 'required|string',
+    //     ]);
+
+    //     // Recherche de la connexion par email
+    //     $connexion = Connexion::where('email', $request->email)->first();
+
+    //     // Vérification des identifiants
+    //     if (!$connexion || !Hash::check($request->password, $connexion->password)) {
+    //         return response()->json(['message' => 'Email ou mot de passe incorrect'], 401);
+    //     }
+
+    //     // Vérification du code de sécurité
+    //     if ($connexion->code_securite !== $request->code_securite) {
+    //         return response()->json(['message' => 'Code de sécurité invalide'], 401);
+    //     }
+
+    //     // Mise à jour du dernier login
+    //     $connexion->last_login = now();
+    //     $connexion->save();
+
+    //     // Création du token d'authentification Sanctum
+    //     $token = $connexion->createToken('auth_token')->plainTextToken;
+
+    //     // Réponse
+    //     return response()->json([
+    //         'message' => 'Connexion réussie',
+    //         'access_token' => $token,
+    //         'token_type' => 'Bearer',
+    //         'utilisateur' => $connexion->utilisateur,
+    //     ], 200);
+    // }
 
     /**
      * Déconnexion : révoque tous les tokens
