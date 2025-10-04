@@ -2,10 +2,23 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Etudiant extends Model
 {
+    use HasFactory;
+
+    // ✅ Autoriser l'assignation de masse pour ces colonnes
+    protected $fillable = [
+        'utilisateur_id',
+        'matricule',
+        'filiere_id',
+        'annee_entree',
+        'annee_academique_id',
+        'statut_diplomation',
+    ];
+
     public function utilisateur()
     {
         return $this->belongsTo(Utilisateur::class);
