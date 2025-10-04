@@ -35,18 +35,25 @@ return [
     |
     */
 
+    // 'guards' => [
+    //     'web' => [
+    //         'driver' => 'session',
+    //         'provider' => 'users',
+    //     ],
+
     'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
-        
+    'sanctum' => [
+        'driver' => 'sanctum',
+        'provider' => 'utilisateurs',
+    ],
+
+
         // ➕ Guard API basé sur Sanctum pour le modèle Connexion
         'api' => [
             'driver' => 'sanctum',
             'provider' => 'connexions',
         ],
-        
+
     ],
 
     /*
@@ -66,11 +73,18 @@ return [
     |
     */
 
+    // 'providers' => [
+    //     'users' => [
+    //         'driver' => 'eloquent',
+    //         'model' => env('AUTH_MODEL', App\Models\User::class),
+    //     ],
+
     'providers' => [
-        'users' => [
+        'utilisateurs' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => App\Models\Utilisateur::class,
         ],
+    
 
         // 'users' => [
         //     'driver' => 'database',

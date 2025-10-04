@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Filiere extends Model
 {
+
+    protected $fillable = ['nom', 'code', 'niveau'];
+
     public function unitesEnseignement()
     {
         return $this->hasMany(UniteEnseignement::class);

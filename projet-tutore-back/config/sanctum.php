@@ -34,7 +34,20 @@ return [
     |
     */
 
-    'guard' => ['web' , 'api'],
+    // 'guard' => ['web' , 'api'],
+
+    'guards' => [
+        'sanctum' => [
+            'driver' => 'sanctum',
+            'provider' => 'utilisateurs',
+        ],
+    ],
+    'providers' => [
+        'utilisateurs' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Utilisateur::class,
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------

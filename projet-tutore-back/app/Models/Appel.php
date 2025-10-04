@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Appel extends Model
 {
+    protected $table = 'appels';
+    protected $fillable = ['cours_id', 'enseignant_id', 'date_heure', 'commentaire', 'etat'];
     public function cours()
     {
         return $this->belongsTo(Cours::class);
@@ -26,4 +28,3 @@ class Appel extends Model
         return $this->hasMany(HistoriqueAppel::class);
     }
 }
-
