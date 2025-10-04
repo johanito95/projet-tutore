@@ -6,7 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Matiere extends Model
 {
-    public function unite()
+
+    protected $table = 'matieres';
+    protected $fillable = ['nom', 'code', 'ue_id', 'credits'];
+    public function uniteEnseignement()
     {
         return $this->belongsTo(UniteEnseignement::class, 'ue_id');
     }

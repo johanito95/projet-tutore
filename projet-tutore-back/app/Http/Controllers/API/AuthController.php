@@ -19,9 +19,7 @@ use App\Mail\CodeSecuriteMail;
 
 class AuthController extends Controller
 {
-    /**
-     * Enregistrement d'un nouvel utilisateur
-     */
+
     public function register(Request $request)
     {
         // Récupération du rôle
@@ -37,7 +35,7 @@ class AuthController extends Controller
             'telephone' => 'required|string|max:20',
             'date_naissance' => 'required|date',
             'email' => 'required|email|unique:connexions,email',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8',
             'role_id' => 'required|exists:roles,id',
         ];
 
@@ -45,7 +43,6 @@ class AuthController extends Controller
         switch (strtolower($role->nom)) {
             case 'etudiant':
                 $rules = array_merge($rules, [
-                    'matricule' => 'required|string|unique:etudiants,matricule',
                     'filiere_id' => 'required|exists:filieres,id',
                     'annee_entree' => 'required|integer',
                     'annee_academique_id' => 'required|exists:annees_academiques,id',
@@ -98,9 +95,10 @@ class AuthController extends Controller
         // Création des entités liées selon le rôle
         switch (strtolower($role->nom)) {
             case 'etudiant':
+                $matricule = $this->generateMatricule($request->annee_entree);
                 Etudiant::create([
                     'utilisateur_id' => $utilisateur->id,
-                    'matricule' => $request->matricule,
+                    'matricule' => $matricule,
                     'filiere_id' => $request->filiere_id,
                     'annee_entree' => $request->annee_entree,
                     'annee_academique_id' => $request->annee_academique_id,
@@ -138,93 +136,51 @@ class AuthController extends Controller
         ], 201);
     }
 
+    private function generateMatricule($anneeEntree)
+    {
+        // Compter le nombre d'étudiants pour l'année d'entrée
+        $count = Etudiant::where('annee_entree', $anneeEntree)->count() + 1;
+        // Générer le matricule au format IUT-YYYY-NNN
+        $matricule = sprintf('IUT-%d-%03d', $anneeEntree, $count);
+        // Vérifier l'unicité
+        while (Etudiant::where('matricule', $matricule)->exists()) {
+            $count++;
+            $matricule = sprintf('IUT-%d-%03d', $anneeEntree, $count);
+        }
+        return $matricule;
+    }
+
     /**
      * Connexion avec email, mot de passe et code de sécurité
      */
 
-public function login(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required|string',
-        'code_securite' => 'required|string',
-    ]);
 
-    $connexion = Connexion::where('email', $request->email)->first();
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|string',
+            'code_securite' => 'required|string',
+        ]);
 
-    if (!$connexion || !Hash::check($request->password, $connexion->password)) {
-        return response()->json(['message' => 'Email ou mot de passe incorrect'], 401);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $connexion = Connexion::where('email', $request->email)->first();
+        if (!$connexion || !Hash::check($request->password, $connexion->password) || $connexion->code_securite !== $request->code_securite) {
+            return response()->json(['message' => 'Identifiants invalides'], 401);
+        }
+
+        $utilisateur = $connexion->utilisateur; // Charge l’utilisateur via la relation
+        $token = $utilisateur->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'redirect_url' => '/',
+            'role' => $utilisateur->role->nom,
+        ]);
     }
-
-    if ($connexion->code_securite !== $request->code_securite) {
-        return response()->json(['message' => 'Code de sécurité invalide'], 401);
-    }
-
-    $connexion->last_login = now();
-    $connexion->save();
-
-    $token = $connexion->createToken('auth_token')->plainTextToken;
-
-    // Récupérer le rôle
-    $roleName = strtolower($connexion->utilisateur->role->nom);
-
-    // Définir l'URL de redirection selon le rôle
-    $redirectUrl = match($roleName) {
-        'etudiant' => '/dashboard/etudiant',
-        'enseignant' => '/dashboard/enseignant',
-        'responsable academique' => '/dashboard/responsable',
-        default => '/dashboard',
-    };
-
-    return response()->json([
-        'message' => 'Connexion réussie',
-        'access_token' => $token,
-        'token_type' => 'Bearer',
-        'utilisateur' => $connexion->utilisateur,
-        'redirect_url' => $redirectUrl,
-        'role' => $roleName,
-    ], 200);
-}
-
-
-    // public function login(Request $request)
-    // {
-    //     // Validation des champs
-    //     $request->validate([
-    //         'email' => 'required|email',
-    //         'password' => 'required|string',
-    //         'code_securite' => 'required|string',
-    //     ]);
-
-    //     // Recherche de la connexion par email
-    //     $connexion = Connexion::where('email', $request->email)->first();
-
-    //     // Vérification des identifiants
-    //     if (!$connexion || !Hash::check($request->password, $connexion->password)) {
-    //         return response()->json(['message' => 'Email ou mot de passe incorrect'], 401);
-    //     }
-
-    //     // Vérification du code de sécurité
-    //     if ($connexion->code_securite !== $request->code_securite) {
-    //         return response()->json(['message' => 'Code de sécurité invalide'], 401);
-    //     }
-
-    //     // Mise à jour du dernier login
-    //     $connexion->last_login = now();
-    //     $connexion->save();
-
-    //     // Création du token d'authentification Sanctum
-    //     $token = $connexion->createToken('auth_token')->plainTextToken;
-
-    //     // Réponse
-    //     return response()->json([
-    //         'message' => 'Connexion réussie',
-    //         'access_token' => $token,
-    //         'token_type' => 'Bearer',
-    //         'utilisateur' => $connexion->utilisateur,
-    //     ], 200);
-    // }
-
     /**
      * Déconnexion : révoque tous les tokens
      */
@@ -234,4 +190,24 @@ public function login(Request $request)
 
         return response()->json(['message' => 'Déconnexion réussie.']);
     }
+
+    /**
+     * Récupérer les informations de l’utilisateur connecté
+     */
+    public function infos(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Utilisateur non authentifié'], 401);
+        }
+
+        return response()->json([
+            'id' => $user->id,
+            'nom' => $user->nom,
+            'prenom' => $user->prenom,
+            'email' => $user->connexion->email,
+            'role' => $user->role->nom,
+        ]);
+    }
+
 }

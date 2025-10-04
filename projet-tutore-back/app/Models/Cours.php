@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cours extends Model
 {
+    protected $table = 'cours';
+    protected $fillable = ['matiere_id', 'enseignant_id', 'salle_id', 'semestre_id', 'annee_academique_id'];
+
     public function matiere()
     {
         return $this->belongsTo(Matiere::class);

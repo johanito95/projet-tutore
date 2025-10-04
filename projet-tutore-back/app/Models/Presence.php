@@ -6,6 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Presence extends Model
 {
+    protected $table = 'presences';
+    protected $fillable = [
+        'appel_id',
+        'etudiant_id',
+        'etat',
+        'date_heure',
+        'remarque'];
     public function appel()
     {
         return $this->belongsTo(Appel::class);

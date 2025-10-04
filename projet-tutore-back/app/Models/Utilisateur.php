@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Sanctum\HasApiTokens;
 
-class Utilisateur extends Model
+class Utilisateur extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, HasApiTokens;
 
     protected $fillable = ['nom', 'prenom', 'telephone', 'date_naissance', 'photo', 'role_id'];
 
@@ -36,18 +37,28 @@ class Utilisateur extends Model
         return $this->hasMany(Habilitation::class);
     }
 
-    public function sauvegardes()
-    {
-        return $this->hasMany(Sauvegarde::class, 'effectue_par');
-    }
+    // public function sauvegardes()
+    // {
+    //     return $this->hasMany(Sauvegarde::class, 'effectue_par');
+    // }
 
-    public function restaurations()
-    {
-        return $this->hasMany(Restauration::class, 'fait_par');
-    }
+    // public function restaurations()
+    // {
+    //     return $this->hasMany(Restauration::class, 'fait_par');
+    // }
 
     public function logs()
     {
         return $this->hasMany(LogAction::class);
     }
+
+    public function hasRole($role)
+    {
+        return $this->role()->value('nom') === $role;
+    }
+
+    // public function hasRole($roleName)
+    // {
+    //     return $this->role && $this->role->nom === $roleName;
+    // }
 }
